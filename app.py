@@ -10,7 +10,7 @@ st.set_page_config(page_title="🎄 Amigo Secreto 🎅", page_icon="🎁", layou
 # --- ENLACE A TU GOOGLE SHEET ---
 SHEET_URL = "https://docs.google.com/spreadsheets/d/12tQaIKfalMhcKjv_Z6Ymw4rqdPY94GB6T6V2cyl4xC0/edit?usp=sharing"
 
-# --- CSS PERSONALIZADO (TARJETAS OSCURAS Y TEXTO BLANCO) ---
+# --- CSS PERSONALIZADO (MODO OSCURO NAVIDEÑO) ---
 st.markdown("""
     <style>
     /* FONDO ROJO NAVIDEÑO */
@@ -33,21 +33,21 @@ st.markdown("""
         border-bottom: 2px dashed #FFFFFF;
     }
 
-    /* TARJETAS DE ESTADO (Donde salen los nombres pendientes) */
+    /* TARJETAS OSCURAS (Gris con borde verde) */
     .status-card {
-        background-color: #2b2b2b; /* GRIS OSCURO */
+        background-color: #2b2b2b;
         padding: 15px;
         border-radius: 10px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.4);
         margin-bottom: 10px;
         border-left: 5px solid #1D6F42;
-        color: #FFFFFF; /* TEXTO BLANCO */
+        color: #FFFFFF;
     }
 
     /* TARJETA DE RESULTADO */
     .secret-result {
-        background-color: #2b2b2b; /* Gris oscuro */
-        color: #ffffff; /* Texto blanco */
+        background-color: #2b2b2b;
+        color: #ffffff;
         padding: 30px; 
         border-radius: 15px;
         text-align: center; 
@@ -58,14 +58,25 @@ st.markdown("""
         box-shadow: 0 10px 20px rgba(0,0,0,0.5);
     }
     
-    /* FORZAR TEXTOS A BLANCO EN GENERAL */
-    h1, h2, h3, p, span, label, div {
+    /* FORZAR TODOS LOS TEXTOS A BLANCO */
+    h1, h2, h3, h4, h5, h6, p, span, label, div, li {
         color: white !important;
     }
     
-    /* EXCEPCIÓN: TEXTO DENTRO DE LOS INPUTS (Para que se vea al escribir) */
+    /* CORRECCIÓN ESPECÍFICA PARA EL EXPANDER (Apartado Borrar) */
+    div[data-testid="stExpander"] details summary p {
+        color: white !important; /* Título del expander */
+        font-weight: bold;
+    }
+    div[data-testid="stExpander"] details summary svg {
+        fill: white !important; /* Flechita del expander */
+        color: white !important;
+    }
+
+    /* EXCEPCIÓN: TEXTO DENTRO DE LOS INPUTS (Para que se vea lo que escribes) */
     .stTextInput input, .stTextArea textarea, .stSelectbox div[data-baseweb="select"] span {
-        color: #333 !important; /* Texto negro dentro de las cajitas blancas */
+        color: #333 !important; /* Negro dentro de la caja blanca */
+        -webkit-text-fill-color: #333 !important;
     }
     
     /* BOTONES VERDES */
@@ -151,6 +162,7 @@ if not juego_iniciado:
 
 else:
     participantes = df["Participante"].tolist()
+    # Limpieza segura de datos
     if df["Visto"].dtype == object:
         df["Visto"] = df["Visto"].map({'TRUE': True, 'FALSE': False, True: True, False: False})
     df["Visto"] = df["Visto"].fillna(False).astype(bool)
@@ -198,7 +210,6 @@ else:
         color_borde = "#00ff00" if visto else "#ffffff"
         status = "Listo" if visto else "Pendiente"
         
-        # Tarjetas pequeñas oscuras
         c.markdown(f"""
         <div class="status-card" style="border-left: 5px solid {color_borde};">
             <strong>{nombre}</strong><br>
@@ -206,7 +217,9 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
+    # SECCIÓN DE BORRADO (Con texto blanco explícito)
     with st.expander("⚙️ Administrar / Borrar Todo"):
+        st.markdown("<p style='color: white;'>⚠️ <strong>Zona de peligro:</strong> Esto borrará todos los datos.</p>", unsafe_allow_html=True)
         pass_check = st.text_input("Escribe 'BORRAR' para confirmar:", key="reset_pass")
         if st.button("🗑️ Reiniciar Sorteo"):
             if pass_check == "BORRAR": 
@@ -215,5 +228,4 @@ else:
                 st.success("Borrado.")
                 time.sleep(1)
                 st.rerun()
-
 
