@@ -191,7 +191,7 @@ if not juego_iniciado:
         input_names = st.text_area(
             "Nombres (uno por línea):",
             height=150,
-            placeholder="Juan\nFlores\nLucho"
+            placeholder="Martin\nDiego\nLucho"
         )
         
         if st.button("🎲 Sortear y Guardar", type="primary"):
@@ -280,5 +280,6 @@ else:
                 st.success("Borrado.")
                 time.sleep(1)
                 st.rerun()
+
 
 
