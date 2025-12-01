@@ -1,9 +1,3 @@
-Entiendo, disculpa. Al parecer el formato de archivo no se está mostrando correctamente en tu dispositivo.
-
-Aquí te pego el código directamente en el chat (sin formato de archivo descargable) para que puedas copiarlo y pegarlo tú mismo:
-
-Python
-
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 import pandas as pd
@@ -252,3 +246,4 @@ else:
                 st.success("Sorteo eliminado.")
                 time.sleep(1)
                 st.rerun()
+
