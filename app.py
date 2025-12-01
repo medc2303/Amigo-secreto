@@ -10,20 +10,25 @@ st.set_page_config(page_title="🎄 Amigo Secreto 🎅", page_icon="🎁", layou
 # --- ENLACE A TU GOOGLE SHEET ---
 SHEET_URL = "https://docs.google.com/spreadsheets/d/12tQaIKfalMhcKjv_Z6Ymw4rqdPY94GB6T6V2cyl4xC0/edit?usp=sharing"
 
-# --- CSS PERSONALIZADO (MODO OSCURO TOTAL) ---
+# --- CSS: MODO OSCURO FORZADO Y ESTILOS ---
 st.markdown("""
     <style>
-    /* FONDO ROJO NAVIDEÑO */
+    /* 1. FORZAR ESQUEMA DE COLOR OSCURO AL NAVEGADOR */
+    :root {
+        color-scheme: dark;
+    }
+    
+    /* 2. FONDO DE LA PÁGINA (Rojo Oscuro Navideño) */
     .stApp {
         background-color: #8B0000;
         background-image: url("https://www.transparenttextures.com/patterns/snow.png");
         background-size: auto;
     }
     
-    /* CABECERA */
+    /* 3. CABECERA */
     .main-header {
         font-family: 'Helvetica Neue', sans-serif; 
-        color: #FFFFFF; 
+        color: #FFFFFF !important; 
         text-align: center; 
         font-size: 3.5em; 
         font-weight: bold;
@@ -33,75 +38,53 @@ st.markdown("""
         border-bottom: 2px dashed #FFFFFF;
     }
 
-    /* TARJETAS DE ESTADO */
+    /* 4. TARJETAS (Fondo Gris Oscuro para que resalte el texto blanco) */
+    .status-card, .secret-result, div[data-testid="stExpander"] {
+        background-color: #2b2b2b !important;
+        color: #FFFFFF !important;
+        border: 1px solid #444;
+    }
+    
     .status-card {
-        background-color: #2b2b2b;
         padding: 15px;
         border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.4);
         margin-bottom: 10px;
-        border-left: 5px solid #1D6F42;
-        color: #FFFFFF;
+        border-left: 5px solid #1D6F42; /* Borde verde */
     }
 
-    /* TARJETA DE RESULTADO */
     .secret-result {
-        background-color: #2b2b2b;
-        color: #ffffff;
         padding: 30px; 
         border-radius: 15px;
         text-align: center; 
-        font-size: 1.8em;
-        font-weight: bold; 
-        margin-top: 20px;
         border: 2px dashed #D42426;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.5);
     }
     
-    /* FORZAR TODOS LOS TEXTOS DE LA UI A BLANCO */
-    h1, h2, h3, h4, h5, h6, p, span, label, div, li, small {
-        color: white !important;
+    /* 5. FORZAR TEXTOS A BLANCO (Arregla el problema del Modo Claro en celulares) */
+    h1, h2, h3, h4, h5, h6, p, span, label, div, li, small, strong {
+        color: #FFFFFF !important;
     }
 
-    /* --- CAMBIO SOLICITADO: INPUTS GRISES CON TEXTO BLANCO --- */
-    
-    /* Área de texto (Nombres) y Inputs (Contraseña) */
+    /* 6. INPUTS (Donde se escribe): Fondo Gris y Texto Blanco */
     .stTextArea textarea, .stTextInput input {
-        background-color: #555555 !important; /* Fondo gris para el input */
-        color: #FFFFFF !important;             /* Texto blanco al escribir */
-        -webkit-text-fill-color: #FFFFFF !important;
-        caret-color: #FFFFFF !important;       /* Cursor blanco */
+        background-color: #555555 !important;
+        color: #FFFFFF !important;
+        caret-color: #FFFFFF !important;
         border: 1px solid #777 !important;
     }
     
-    /* Selectbox (Menú desplegable) */
+    /* 7. SELECTBOX (El menú desplegable) */
     .stSelectbox div[data-baseweb="select"] {
         background-color: #555555 !important;
         color: white !important;
         border: 1px solid #777 !important;
     }
     
-    /* El texto seleccionado dentro del selectbox */
-    .stSelectbox div[data-baseweb="select"] span {
-        color: white !important;
-        -webkit-text-fill-color: white !important;
-    }
-    
-    /* Opciones del menú desplegable (cuando se abre) */
+    /* Opciones del menú */
     ul[data-baseweb="menu"] {
         background-color: #333333 !important;
     }
     
-    /* --- FIN CAMBIO SOLICITADO --- */
-
-    /* Corrección para expander */
-    div[data-testid="stExpander"] details summary p, 
-    div[data-testid="stExpander"] details summary svg {
-        color: white !important;
-        fill: white !important;
-    }
-    
-    /* Botones Verdes */
+    /* 8. BOTONES */
     .stButton button {
         background-color: #1D6F42 !important;
         color: white !important;
@@ -111,6 +94,14 @@ st.markdown("""
     .stButton button:hover {
         background-color: #268c54 !important;
         border-color: #8B0000;
+    }
+    
+    /* Corrección extra para textos en webkit (iOS) */
+    * {
+        -webkit-text-fill-color: initial;
+    }
+    .stTextArea textarea, .stTextInput input, .stSelectbox span {
+        -webkit-text-fill-color: #FFFFFF !important;
     }
     </style>
     
@@ -137,20 +128,56 @@ def guardar_datos(df):
     st.cache_data.clear()
 
 def realizar_sorteo(names):
+    """
+    Realiza el sorteo con una condición especial:
+    Si existen 'Flores' y 'Lucho', Flores SIEMPRE le regala a Lucho.
+    """
     givers = names.copy()
     receivers = names.copy()
+    assignment = {}
+
+    # --- LÓGICA TRUCADA ---
+    # Normalizamos un poco para buscar sin importar mayúsculas exactas si fuera necesario,
+    # pero aquí buscamos match exacto según tu pedido.
+    
+    # Verificamos si ambos están en la lista
+    if "Flores" in names and "Lucho" in names:
+        # Asignación forzada
+        assignment["Flores"] = "Lucho"
+        
+        # Los sacamos de las listas para sortear al resto
+        # Flores ya dio regalo (lo sacamos de givers)
+        givers.remove("Flores")
+        # Lucho ya recibió regalo (lo sacamos de receivers)
+        receivers.remove("Lucho")
+    
+    # --- SORTEO DEL RESTO ---
+    # Intentamos barajar hasta que nadie se toque a sí mismo
+    # Nota: Como quitamos gente, las listas pueden no coincidir en índice, 
+    # así que verificamos por valor.
     while True:
         random.shuffle(receivers)
-        if not any(g == r for g, r in zip(givers, receivers)):
+        
+        # Verificamos conflictos (que alguien se regale a sí mismo)
+        conflict = False
+        for g, r in zip(givers, receivers):
+            if g == r:
+                conflict = True
+                break
+        
+        if not conflict:
             break
-    df = pd.DataFrame({
-        "Participante": givers,
-        "Amigo": receivers,
-        "Visto": [False] * len(givers)
-    })
+            
+    # Agregamos los resultados del resto al diccionario de asignaciones
+    for g, r in zip(givers, receivers):
+        assignment[g] = r
+        
+    # Convertimos a DataFrame para guardar
+    df = pd.DataFrame(list(assignment.items()), columns=["Participante", "Amigo"])
+    df["Visto"] = [False] * len(df)
     return df
 
-# --- APP ---
+# --- APP LÓGICA ---
 df = cargar_datos()
 juego_iniciado = not df.empty and "Participante" in df.columns and len(df) > 0
 
@@ -160,30 +187,33 @@ if not juego_iniciado:
         st.info("👋 Configuración del juego")
         
         st.markdown("<h3>🛠️ Crear Nuevo Sorteo</h3>", unsafe_allow_html=True)
-        # El texto que escribas aquí ahora será BLANCO sobre fondo GRIS
+        # Input con estilo forzado oscuro
         input_names = st.text_area(
             "Nombres (uno por línea):",
             height=150,
-            placeholder="Martin\nDiego\nLucho"
+            placeholder="Juan\nFlores\nLucho"
         )
         
         if st.button("🎲 Sortear y Guardar", type="primary"):
             names_list = [n.strip() for n in input_names.replace(',', '\n').split('\n') if n.strip()]
+            
+            # Validaciones básicas
             if len(names_list) < 3:
-                st.error("Mínimo 3 personas.")
+                st.error("Mínimo 3 personas para jugar.")
             elif len(names_list) != len(set(names_list)):
-                st.error("Nombres duplicados.")
+                st.error("Hay nombres duplicados. Usa apellidos si es necesario.")
             else:
-                with st.spinner("Sorteando..."):
+                with st.spinner("Realizando sorteo..."):
                     nuevo_df = realizar_sorteo(names_list)
                     guardar_datos(nuevo_df)
-                    st.success("¡Listo!")
+                    st.success("¡Sorteo realizado con éxito!")
                     time.sleep(1)
                     st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
 else:
     participantes = df["Participante"].tolist()
+    # Limpieza de datos
     if df["Visto"].dtype == object:
         df["Visto"] = df["Visto"].map({'TRUE': True, 'FALSE': False, True: True, False: False})
     df["Visto"] = df["Visto"].fillna(False).astype(bool)
@@ -210,10 +240,12 @@ else:
                     df.at[idx, "Visto"] = True
                     guardar_datos(df)
                     st.balloons()
+                    
+                    # Resultado en verde neón para resaltar
                     st.markdown(f"""
                     <div class="secret-result">
                         🤫 Tu Amigo Secreto es:<br><br>
-                        <span style="font-size: 2.5em; color: #00ff00; text-shadow: 0px 0px 10px #00ff00;">✨ {amigo_secreto} ✨</span>
+                        <span style="font-size: 2.5em; color: #00ff00 !important; text-shadow: 0px 0px 10px #00ff00;">✨ {amigo_secreto} ✨</span>
                     </div>
                     """, unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
@@ -237,9 +269,9 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
+    # SECCIÓN DE BORRADO
     with st.expander("⚙️ Administrar / Borrar Todo"):
         st.markdown("<p style='color: white;'>⚠️ <strong>Zona de peligro:</strong> Esto borrará todos los datos.</p>", unsafe_allow_html=True)
-        # El texto que escribas aquí ahora será BLANCO sobre fondo GRIS
         pass_check = st.text_input("Escribe 'BORRAR' para confirmar:", key="reset_pass")
         if st.button("🗑️ Reiniciar Sorteo"):
             if pass_check == "BORRAR": 
@@ -248,4 +280,5 @@ else:
                 st.success("Borrado.")
                 time.sleep(1)
                 st.rerun()
+
 
