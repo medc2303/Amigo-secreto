@@ -270,8 +270,22 @@ else:
         status = "Listo" if visto else "Pendiente"
         
         c.markdown(f"""
-        <div class="status-card" style="
+        <div class="status-card" style="border-left: 5px solid {color_borde};">
+            <strong>{nombre}</strong><br>
+            <span>{icon} {status}</span>
+        </div>
+        """, unsafe_allow_html=True)
 
+    with st.expander("⚙️ Administrar / Borrar Todo"):
+        st.markdown("<p>⚠️ Zona de peligro: Borrar todo.</p>", unsafe_allow_html=True)
+        pass_check = st.text_input("Escribe 'BORRAR' para confirmar:", key="reset_pass")
+        if st.button("🗑️ Reiniciar Sorteo"):
+            if pass_check == "BORRAR": 
+                df_vacio = pd.DataFrame(columns=["Participante", "Amigo", "Visto"])
+                guardar_datos(df_vacio)
+                st.success("Borrado.")
+                time.sleep(1)
+                st.rerun()
 
 
 
