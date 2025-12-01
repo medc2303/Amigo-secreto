@@ -10,22 +10,104 @@ st.set_page_config(page_title="🎄 Amigo Secreto 🎅", page_icon="🎁", layou
 # --- ENLACE A TU GOOGLE SHEET ---
 SHEET_URL = "https://docs.google.com/spreadsheets/d/12tQaIKfalMhcKjv_Z6Ymw4rqdPY94GB6T6V2cyl4xC0/edit?usp=sharing"
 
-# --- CSS: MODO OSCURO FORZADO Y ESTILOS ---
+# --- CSS: MODO OSCURO FORZADO AGRESIVO ---
 st.markdown("""
     <style>
-    /* 1. FORZAR ESQUEMA DE COLOR OSCURO AL NAVEGADOR */
-    :root {
-        color-scheme: dark;
-    }
-    
-    /* 2. FONDO DE LA PÁGINA (Rojo Oscuro Navideño) */
+    /* 1. FORZAR FONDO Y TEXTO GLOBAL */
     .stApp {
-        background-color: #8B0000;
+        background-color: #8B0000; /* Rojo Navideño */
         background-image: url("https://www.transparenttextures.com/patterns/snow.png");
-        background-size: auto;
+        color: white !important;
     }
     
-    /* 3. CABECERA */
+    /* 2. FORZAR TODOS LOS TEXTOS A BLANCO (Títulos, párrafos, etiquetas) */
+    h1, h2, h3, h4, h5, h6, p, div, span, label, li, small, strong {
+        color: #FFFFFF !important;
+    }
+    
+    /* 3. INPUTS Y TEXTAREAS (Donde escribes nombres) */
+    /* Forzamos el fondo gris oscuro y texto blanco */
+    .stTextInput input, .stTextArea textarea {
+        background-color: #333333 !important; 
+        color: white !important;
+        border: 1px solid #555 !important;
+    }
+    /* El placeholder (texto de ayuda) un poco más gris */
+    .stTextInput input::placeholder, .stTextArea textarea::placeholder {
+        color: #cccccc !important;
+    }
+
+    /* 4. SELECTBOX (Menú desplegable) - EL MÁS DIFÍCIL */
+    /* La caja cerrada */
+    div[data-baseweb="select"] > div {
+        background-color: #333333 !important;
+        color: white !important;
+        border-color: #555 !important;
+    }
+    /* El texto seleccionado */
+    div[data-baseweb="select"] span {
+        color: white !important;
+    }
+    /* El ícono de la flechita */
+    div[data-baseweb="select"] svg {
+        fill: white !important;
+    }
+    
+    /* EL MENÚ DESPLEGABLE (Cuando le das clic) */
+    /* Fondo del menú flotante */
+    div[data-baseweb="popover"], div[data-baseweb="menu"], ul {
+        background-color: #222222 !important;
+    }
+    /* Las opciones de la lista */
+    li[id^="bui-"] {
+        color: white !important; 
+    }
+    /* Opción al pasar el mouse (hover) */
+    li[aria-selected="false"]:hover {
+        background-color: #444444 !important;
+    }
+    
+    /* 5. TARJETAS PERSONALIZADAS */
+    .status-card {
+        background-color: #2b2b2b !important;
+        border: 1px solid #444;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        border-left: 5px solid #1D6F42;
+        color: white !important;
+    }
+
+    .secret-result {
+        background-color: #2b2b2b !important;
+        border: 2px dashed #D42426;
+        padding: 30px; 
+        border-radius: 15px;
+        text-align: center;
+        color: white !important; 
+    }
+
+    /* 6. BOTONES */
+    .stButton button {
+        background-color: #1D6F42 !important;
+        color: white !important;
+        border: 1px solid white !important;
+    }
+    
+    /* 7. EXPANDER (Sección borrar) */
+    div[data-testid="stExpander"] {
+        background-color: #2b2b2b !important;
+        border: 1px solid #444;
+        color: white !important;
+    }
+    div[data-testid="stExpander"] p {
+        color: white !important;
+    }
+    div[data-testid="stExpander"] svg {
+        fill: white !important;
+    }
+    
+    /* CABECERA */
     .main-header {
         font-family: 'Helvetica Neue', sans-serif; 
         color: #FFFFFF !important; 
@@ -36,72 +118,6 @@ st.markdown("""
         padding-bottom: 20px;
         margin-bottom: 20px;
         border-bottom: 2px dashed #FFFFFF;
-    }
-
-    /* 4. TARJETAS (Fondo Gris Oscuro para que resalte el texto blanco) */
-    .status-card, .secret-result, div[data-testid="stExpander"] {
-        background-color: #2b2b2b !important;
-        color: #FFFFFF !important;
-        border: 1px solid #444;
-    }
-    
-    .status-card {
-        padding: 15px;
-        border-radius: 10px;
-        margin-bottom: 10px;
-        border-left: 5px solid #1D6F42; /* Borde verde */
-    }
-
-    .secret-result {
-        padding: 30px; 
-        border-radius: 15px;
-        text-align: center; 
-        border: 2px dashed #D42426;
-    }
-    
-    /* 5. FORZAR TEXTOS A BLANCO (Arregla el problema del Modo Claro en celulares) */
-    h1, h2, h3, h4, h5, h6, p, span, label, div, li, small, strong {
-        color: #FFFFFF !important;
-    }
-
-    /* 6. INPUTS (Donde se escribe): Fondo Gris y Texto Blanco */
-    .stTextArea textarea, .stTextInput input {
-        background-color: #555555 !important;
-        color: #FFFFFF !important;
-        caret-color: #FFFFFF !important;
-        border: 1px solid #777 !important;
-    }
-    
-    /* 7. SELECTBOX (El menú desplegable) */
-    .stSelectbox div[data-baseweb="select"] {
-        background-color: #555555 !important;
-        color: white !important;
-        border: 1px solid #777 !important;
-    }
-    
-    /* Opciones del menú */
-    ul[data-baseweb="menu"] {
-        background-color: #333333 !important;
-    }
-    
-    /* 8. BOTONES */
-    .stButton button {
-        background-color: #1D6F42 !important;
-        color: white !important;
-        font-weight: bold;
-        border: 1px solid #ffffff;
-    }
-    .stButton button:hover {
-        background-color: #268c54 !important;
-        border-color: #8B0000;
-    }
-    
-    /* Corrección extra para textos en webkit (iOS) */
-    * {
-        -webkit-text-fill-color: initial;
-    }
-    .stTextArea textarea, .stTextInput input, .stSelectbox span {
-        -webkit-text-fill-color: #FFFFFF !important;
     }
     </style>
     
@@ -129,36 +145,30 @@ def guardar_datos(df):
 
 def realizar_sorteo(names):
     """
-    Realiza el sorteo con una condición especial:
-    Si existen 'Flores' y 'Lucho', Flores SIEMPRE le regala a Lucho.
+    Sorteo con truco: Flores -> Lucho siempre.
     """
     givers = names.copy()
     receivers = names.copy()
     assignment = {}
 
     # --- LÓGICA TRUCADA ---
-    # Normalizamos un poco para buscar sin importar mayúsculas exactas si fuera necesario,
-    # pero aquí buscamos match exacto según tu pedido.
+    # Buscamos "Flores" y "Lucho" (quitamos espacios extra por si acaso)
+    # Convertimos a lista limpia para comparar
     
-    # Verificamos si ambos están en la lista
+    # Verificamos si ambos están en la lista (búsqueda exacta)
     if "Flores" in names and "Lucho" in names:
         # Asignación forzada
         assignment["Flores"] = "Lucho"
         
-        # Los sacamos de las listas para sortear al resto
-        # Flores ya dio regalo (lo sacamos de givers)
+        # Los sacamos de las bolsas
         givers.remove("Flores")
-        # Lucho ya recibió regalo (lo sacamos de receivers)
         receivers.remove("Lucho")
     
     # --- SORTEO DEL RESTO ---
-    # Intentamos barajar hasta que nadie se toque a sí mismo
-    # Nota: Como quitamos gente, las listas pueden no coincidir en índice, 
-    # así que verificamos por valor.
     while True:
         random.shuffle(receivers)
         
-        # Verificamos conflictos (que alguien se regale a sí mismo)
+        # Verificamos conflictos
         conflict = False
         for g, r in zip(givers, receivers):
             if g == r:
@@ -168,11 +178,10 @@ def realizar_sorteo(names):
         if not conflict:
             break
             
-    # Agregamos los resultados del resto al diccionario de asignaciones
+    # Agregamos los resultados
     for g, r in zip(givers, receivers):
         assignment[g] = r
         
-    # Convertimos a DataFrame para guardar
     df = pd.DataFrame(list(assignment.items()), columns=["Participante", "Amigo"])
     df["Visto"] = [False] * len(df)
     return df
@@ -183,37 +192,36 @@ juego_iniciado = not df.empty and "Participante" in df.columns and len(df) > 0
 
 if not juego_iniciado:
     with st.container():
+        # Fondo oscuro manual para contenedor
         st.markdown('<div style="background-color: rgba(40, 40, 40, 0.9); padding: 20px; border-radius: 10px; border: 1px solid #555;">', unsafe_allow_html=True)
         st.info("👋 Configuración del juego")
         
         st.markdown("<h3>🛠️ Crear Nuevo Sorteo</h3>", unsafe_allow_html=True)
-        # Input con estilo forzado oscuro
+        
         input_names = st.text_area(
             "Nombres (uno por línea):",
             height=150,
-            placeholder="Martin\nDiego\nLucho"
+            placeholder="Juan\nFlores\nLucho"
         )
         
         if st.button("🎲 Sortear y Guardar", type="primary"):
             names_list = [n.strip() for n in input_names.replace(',', '\n').split('\n') if n.strip()]
             
-            # Validaciones básicas
             if len(names_list) < 3:
-                st.error("Mínimo 3 personas para jugar.")
+                st.error("Mínimo 3 personas.")
             elif len(names_list) != len(set(names_list)):
-                st.error("Hay nombres duplicados. Usa apellidos si es necesario.")
+                st.error("Hay nombres duplicados.")
             else:
-                with st.spinner("Realizando sorteo..."):
+                with st.spinner("Sorteando..."):
                     nuevo_df = realizar_sorteo(names_list)
                     guardar_datos(nuevo_df)
-                    st.success("¡Sorteo realizado con éxito!")
+                    st.success("¡Listo!")
                     time.sleep(1)
                     st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
 else:
     participantes = df["Participante"].tolist()
-    # Limpieza de datos
     if df["Visto"].dtype == object:
         df["Visto"] = df["Visto"].map({'TRUE': True, 'FALSE': False, True: True, False: False})
     df["Visto"] = df["Visto"].fillna(False).astype(bool)
@@ -241,7 +249,6 @@ else:
                     guardar_datos(df)
                     st.balloons()
                     
-                    # Resultado en verde neón para resaltar
                     st.markdown(f"""
                     <div class="secret-result">
                         🤫 Tu Amigo Secreto es:<br><br>
@@ -263,23 +270,8 @@ else:
         status = "Listo" if visto else "Pendiente"
         
         c.markdown(f"""
-        <div class="status-card" style="border-left: 5px solid {color_borde};">
-            <strong>{nombre}</strong><br>
-            <span>{icon} {status}</span>
-        </div>
-        """, unsafe_allow_html=True)
+        <div class="status-card" style="
 
-    # SECCIÓN DE BORRADO
-    with st.expander("⚙️ Administrar / Borrar Todo"):
-        st.markdown("<p style='color: white;'>⚠️ <strong>Zona de peligro:</strong> Esto borrará todos los datos.</p>", unsafe_allow_html=True)
-        pass_check = st.text_input("Escribe 'BORRAR' para confirmar:", key="reset_pass")
-        if st.button("🗑️ Reiniciar Sorteo"):
-            if pass_check == "BORRAR": 
-                df_vacio = pd.DataFrame(columns=["Participante", "Amigo", "Visto"])
-                guardar_datos(df_vacio)
-                st.success("Borrado.")
-                time.sleep(1)
-                st.rerun()
 
 
 
